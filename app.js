@@ -13,6 +13,7 @@ const app = {
     loadGame: (gameType) => {
         const menuView = document.getElementById('menu-view');
         const gameView = document.getElementById('game-view');
+        const referenceView = document.getElementById('reference-view');
         const gameContainer = document.getElementById('game-container');
 
         menuView.classList.remove('active');
@@ -20,41 +21,98 @@ const app = {
 
         setTimeout(() => {
             menuView.style.display = 'none';
-            gameView.style.display = 'block';
-            setTimeout(() => {
-                gameView.classList.remove('hidden');
-                gameView.classList.add('active');
-            }, 50);
+
+            if (gameType === 'study-reference') {
+                referenceView.style.display = 'block';
+                setTimeout(() => {
+                    referenceView.classList.remove('hidden');
+                    referenceView.classList.add('active');
+                    app.switchTab('present'); // Default tab
+                }, 50);
+            } else {
+                gameView.style.display = 'block';
+                setTimeout(() => {
+                    gameView.classList.remove('hidden');
+                    gameView.classList.add('active');
+                }, 50);
+
+                app.state.currentGame = gameType;
+                app.state.currentLevel = 0;
+                app.state.score = 0;
+                gameContainer.innerHTML = '';
+
+                if (gameType === 'sentence-builder') {
+                    app.renderSentenceBuilder(0);
+                } else if (gameType === 'word-translator') {
+                    app.renderTranslator(0);
+                }
+            }
         }, 500);
-
-        app.state.currentGame = gameType;
-        app.state.currentLevel = 0;
-        app.state.score = 0;
-
-        gameContainer.innerHTML = ''; // Clear previous
-
-        if (gameType === 'sentence-builder') {
-            app.renderSentenceBuilder(0);
-        } else if (gameType === 'word-translator') {
-            app.renderTranslator(0);
-        }
     },
 
     showMenu: () => {
         const menuView = document.getElementById('menu-view');
         const gameView = document.getElementById('game-view');
+        const referenceView = document.getElementById('reference-view');
 
         gameView.classList.remove('active');
         gameView.classList.add('hidden');
+        if (referenceView) {
+            referenceView.classList.remove('active');
+            referenceView.classList.add('hidden');
+        }
 
         setTimeout(() => {
             gameView.style.display = 'none';
+            if (referenceView) referenceView.style.display = 'none';
             menuView.style.display = 'block';
             setTimeout(() => {
                 menuView.classList.remove('hidden');
                 menuView.classList.add('active');
             }, 50);
         }, 500);
+    },
+
+    // --- REFERENCE SECTION LOGIC ---
+    switchTab: (tense) => {
+        const buttons = document.querySelectorAll('.tab-btn');
+        buttons.forEach(b => b.classList.remove('active'));
+
+        const tenseMap = { 'present': 0, 'past': 1, 'future': 2 };
+        if (buttons[tenseMap[tense]]) buttons[tenseMap[tense]].classList.add('active');
+
+        const container = document.getElementById('reference-content');
+        const data = gameData.reference[tense];
+
+        let html = `
+            <h2 style="text-align:center; font-size: 2rem; margin-bottom: 2rem; color: var(--text-main);">${data.title}</h2>
+            
+            <h3 class="reference-section-title">📝 Palabras Clave (Vocabulario)</h3>
+            <div class="word-list-grid">
+                ${data.words.map(w => `
+                    <div class="ref-card">
+                        <div class="ref-eng">${w.word}</div>
+                        <div class="ref-esp">${w.trans}</div>
+                        <div style="font-size: 0.8rem; color: var(--primary); margin-top: 0.5rem;">${w.type}</div>
+                    </div>
+                `).join('')}
+            </div>
+
+            <h3 class="reference-section-title">🗣️ Oraciones de Ejemplo</h3>
+            <div class="ref-sentences-list">
+                ${data.sentences.map(s => `
+                    <div class="sentence-row">
+                        <div class="sent-eng">${s.eng}</div>
+                        <div class="sent-esp">${s.esp}</div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+
+        container.innerHTML = html;
+        container.style.opacity = '0';
+        setTimeout(() => container.style.opacity = '1', 50);
+        container.style.transition = 'opacity 0.3s';
     },
 
     // --- GAME 1: SENTENCE BUILDER ---
