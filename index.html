@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=final-rev">
 </head>
 
 <body>
@@ -134,30 +134,54 @@
             </section>
         </main>
 
-        <!-- Notification -->
+        <!-- Notification / Grammar Modal -->
         <div id="grammar-modal" class="modal hidden">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2>Guía Rápida</h2>
+                    <h2>guía de Estructura</h2>
                     <button class="close-btn" onclick="app.toggleGrammarHelp()">×</button>
                 </div>
                 <div class="modal-body">
                     <div class="concept-item">
-                        <h3>Tips Rápidos</h3>
-                        <p><strong>Pasado:</strong> Suele terminar en -ed (jugó/play-ed) o cambiar (fue/went).</p>
-                        <p><strong>Futuro:</strong> Busca la palabra 'Will'.</p>
-                        <p><strong>Presente:</strong> Cosas que haces habitualmente.</p>
+                        <h3>1. Estructura Básica</h3>
+                        <div class="structure-box">
+                            <span class="bad">Sujeto</span> + <span class="good">Verbo</span> + <span
+                                class="accent">Objeto</span>
+                        </div>
+                        <p class="example">Ex: I (Sujeto) + eat (Verbo) + apples (Objeto)</p>
+                    </div>
+
+                    <div class="concept-item">
+                        <h3>2. Adjetivos (Color, Tamaño)</h3>
+                        <p>Van <strong>ANTES</strong> del objeto/cosa.</p>
+                        <div class="structure-box">
+                            <span class="bad">Adjetivo</span> + <span class="accent">Cosa</span>
+                        </div>
+                        <p class="example">Ex: The <span class="highlight-text">Red</span> Car (El carro rojo)</p>
+                    </div>
+
+                    <div class="concept-item">
+                        <h3>3. Posesivos</h3>
+                        <p>Indican de quién es.</p>
+                        <p class="example">My, Your, His, Her, Our, Their</p>
+                    </div>
+
+                    <div class="concept-item">
+                        <h3>4. Reflexivos</h3>
+                        <p>Cuando la acción cae sobre ti mismo.</p>
+                        <p class="example">Myself, Yourself, Himself</p>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- Footer -->
         <footer>
             <p>English Master v4.0 - All in One Study App</p>
         </footer>
     </div>
-    <script src="data.js"></script>
-    <script src="app.js"></script>
+    <script src="data.js?v=final-rev"></script>
+    <script src="app.js?v=final-rev"></script>
 </body>
 
 </html>
