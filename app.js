@@ -8,7 +8,7 @@ const app = {
     },
 
     init: () => {
-        console.log("English Master v4 Initialized");
+        console.log("English Master v5 - Neon Edition Initialized");
     },
 
     loadGame: (type) => {
@@ -70,7 +70,7 @@ const app = {
         }, 500);
     },
 
-    // --- 1. Sentence Builder ---
+    // --- 1. Sentence Builder (Fixed Tooltips) ---
     renderSentenceBuilder: (index) => {
         if (index >= gameData.sentences.length) return app.finishGame();
         const data = gameData.sentences[index];
@@ -78,11 +78,11 @@ const app = {
 
         document.getElementById('game-container').innerHTML = `
             <div style="text-align:center;">
-                <h3>${data.category}</h3>
-                <p>Ordena: "${data.translation}"</p>
+                <span class="highlight" style="font-size:1rem; text-transform:uppercase; letter-spacing:2px; display:block; margin-bottom:1rem;">${data.category}</span>
+                <p style="font-size:1.2rem; margin-bottom:2rem; color:var(--text-muted);">Ordena: <strong style="color:var(--text-main); font-size:1.4rem;">"${data.translation}"</strong></p>
                 <div id="target" class="sentence-slot"></div>
                 <div id="source" class="word-pool">
-                    ${words.map((w, i) => `<div class="word-chip" id="w${i}" onclick="app.me(this)">${w.text}</div>`).join('')}
+                    ${words.map((w, i) => `<div class="word-chip" id="w${i}" data-trans="${w.trans}" onclick="app.me(this)">${w.text}</div>`).join('')}
                 </div>
                 <button class="btn-primary" onclick="app.checkSent(${index})">Verificar</button>
                 <div id="feedback"></div>
@@ -116,9 +116,11 @@ const app = {
         };
 
         document.getElementById('game-container').innerHTML = `
-            <h3 style="text-align:center; margin-bottom:2rem;">Selecciona una Categoría</h3>
-            <div class="category-grid">
-                ${cats.map(c => `<div class="category-btn" onclick="app.startTranslator('${c}')">${labels[c] || c}</div>`).join('')}
+            <div style="text-align:center;">
+                <h3 style="margin-bottom:2rem; color:var(--text-muted);">Selecciona una Categoría</h3>
+                <div class="category-grid">
+                    ${cats.map(c => `<div class="category-btn" onclick="app.startTranslator('${c}')">${labels[c] || c}</div>`).join('')}
+                </div>
             </div>
         `;
     },
@@ -131,22 +133,35 @@ const app = {
         const item = app.state.currentQueue[index];
         document.getElementById('game-container').innerHTML = `
             <div style="text-align:center">
-                <h2>${item.eng}</h2>
-                <p>${item.hint}</p>
-                <input type="text" id="inp" style="padding:1rem; border-radius:8px; width:100%; margin:1rem 0; font-size:1.2rem;" placeholder="En español...">
-                <button class="btn-primary" onclick="app.checkTrans(${index})">Comprobar</button>
+                <span class="highlight" style="font-size:1rem; text-transform:uppercase; letter-spacing:2px; display:block; margin-bottom:1rem;">Traduce</span>
+                <h2 style="font-size:3rem; margin-bottom:0.5rem;">${item.eng}</h2>
+                <p style="color:var(--text-muted); margin-bottom:2rem;">${item.hint}</p>
+                <div style="max-width:400px; margin:0 auto;">
+                    <input type="text" id="inp" class="translator-input" style="width:100%; margin-bottom:1rem;" placeholder="Tu respuesta..." autocomplete="off">
+                    <button class="btn-primary" style="width:100%" onclick="app.checkTrans(${index})">Comprobar</button>
+                </div>
                 <div id="feedback"></div>
             </div>
         `;
+        // Auto-check on Enter
+        setTimeout(() => {
+            const input = document.getElementById('inp');
+            if (input) {
+                input.focus();
+                input.addEventListener('keyup', (e) => {
+                    if (e.key === 'Enter') app.checkTrans(index);
+                });
+            }
+        }, 50);
     },
     checkTrans: (index) => {
         const val = document.getElementById('inp').value.toLowerCase().trim();
         const item = app.state.currentQueue[index];
         if (item.esp.includes(val)) {
-            document.getElementById('feedback').innerHTML = `<div class="feedback-msg correct">¡Bien!</div>`;
-            setTimeout(() => app.renderTranslator(index + 1), 1000);
+            document.getElementById('feedback').innerHTML = `<div class="feedback-msg correct">¡Excelente!</div>`;
+            setTimeout(() => app.renderTranslator(index + 1), 800);
         } else {
-            document.getElementById('feedback').innerHTML = `<div class="feedback-msg error">Era: ${item.esp[0]}</div>`;
+            document.getElementById('feedback').innerHTML = `<div class="feedback-msg error">Solución: ${item.esp[0]}</div>`;
         }
     },
 
@@ -154,39 +169,64 @@ const app = {
     renderFillBlank: (index) => {
         if (index >= gameData.fillBlank.length) return app.finishGame();
         const item = gameData.fillBlank[index];
-        // Split sentence by '___'
         const parts = item.sent.split('___');
 
         document.getElementById('game-container').innerHTML = `
-            <div style="text-align:center; font-size:1.5rem; margin-bottom:2rem;">
-                ${parts[0]} <input id="blank-inp" class="blank-input"> ${parts[1]}
+            <div style="text-align:center; margin-top:2rem;">
+                 <h3 style="margin-bottom:2rem; font-size:1.8rem; line-height:2;">
+                    ${parts[0]} 
+                    <input id="blank-inp" class="blank-input" autocomplete="off"> 
+                    ${parts[1]}
+                </h3>
+                <p style="color:var(--text-muted); margin-bottom:2rem;">Pista: ${item.hint}</p>
+                <div class="options-grid">
+                    ${item.options.map(o => `<button class="game-option-btn" onclick="app.fillAndCheck(${index}, '${o}')">${o}</button>`).join('')}
+                </div>
+                <div id="feedback"></div>
             </div>
-            <div class="options-grid">
-                ${item.options.map(o => `<button class="game-option-btn" onclick="document.getElementById('blank-inp').value='${o}'; app.checkBlank(${index}, '${o}')">${o}</button>`).join('')}
-            </div>
-            <div id="feedback"></div>
         `;
+        // Auto-check on Enter
+        setTimeout(() => {
+            const input = document.getElementById('blank-inp');
+            if (input) {
+                input.focus();
+                input.addEventListener('keyup', (e) => {
+                    if (e.key === 'Enter') app.checkBlank(index, input.value);
+                });
+            }
+        }, 50);
+    },
+    fillAndCheck: (index, val) => {
+        document.getElementById('blank-inp').value = val;
+        app.checkBlank(index, val);
     },
     checkBlank: (index, val) => {
         const item = gameData.fillBlank[index];
-        if (val === item.correct) {
-            document.getElementById('feedback').innerHTML = `<div class="feedback-msg correct">Correcto!</div>`;
+        const feedback = document.getElementById('feedback');
+        if (val.toLowerCase() === item.correct.toLowerCase()) {
+            feedback.innerHTML = `<div class="feedback-msg correct">¡Perfecto!</div>`;
+            document.getElementById('blank-inp').style.borderColor = "#4ade80";
+            document.getElementById('blank-inp').style.color = "#4ade80";
             setTimeout(() => app.renderFillBlank(index + 1), 1000);
         } else {
-            document.getElementById('feedback').innerHTML = `<div class="feedback-msg error">Incorrecto</div>`;
+            feedback.innerHTML = `<div class="feedback-msg error">Intenta de nuevo</div>`;
+            document.getElementById('blank-inp').style.borderColor = "#fb7185";
         }
     },
 
     // --- 4. Memory ---
     renderMemory: () => {
-        const cards = [...gameData.memoryCards, ...gameData.memoryCards]; // Duplicate ? No, stored as pairs.
-        // Actually pairs are stored as separate items in memoryCards array in data.js.
-        // Shuffle
-        const deck = [...gameData.memoryCards].sort(() => Math.random() - 0.5);
+        // Flat list pairs manually to ensure correct IDs
+        const deck = [...gameData.memoryCards, ...gameData.memoryCards].slice(0, 12); // Limit to 12 cards for now (6 pairs)
+        // Actually, previous implementation just duplicated the array.
+        // Let's make sure we have pairs. logic in data.js was: IDs 1-6.
+        // We need 12 cards total.
+        const cards = [...gameData.memoryCards]; // 12 items
+        const shuffled = cards.sort(() => Math.random() - 0.5);
 
         document.getElementById('game-container').innerHTML = `
             <div class="memory-grid">
-                ${deck.map((c, i) => `
+                ${shuffled.map((c, i) => `
                     <div class="memory-card" id="mem-${i}" onclick="app.flipCard(${i}, '${c.id}', '${c.content}')">
                         <div class="front">?</div>
                     </div>
@@ -194,7 +234,6 @@ const app = {
             </div>
         `;
         app.state.memoryFlipped = [];
-        app.state.memoryMatched = [];
     },
     flipCard: (index, id, content) => {
         if (app.state.memoryFlipped.length >= 2) return;
@@ -230,12 +269,14 @@ const app = {
         if (index >= gameData.trueFalse.length) return app.finishGame();
         const item = gameData.trueFalse[index];
         document.getElementById('game-container').innerHTML = `
-            <h2 style="text-align:center; margin-bottom:2rem;">${item.q}</h2>
-            <div class="options-grid">
-                <button class="game-option-btn" onclick="app.checkTF(${index}, true)">Verdadero</button>
-                <button class="game-option-btn" onclick="app.checkTF(${index}, false)">Falso</button>
+            <div style="text-align:center; margin-top:2rem;">
+                <h2 style="font-size:2rem; margin-bottom:3rem;">${item.q}</h2>
+                <div class="options-grid">
+                    <button class="game-option-btn" onclick="app.checkTF(${index}, true)">Verdadero</button>
+                    <button class="game-option-btn" onclick="app.checkTF(${index}, false)">Falso</button>
+                </div>
+                <div id="feedback"></div>
             </div>
-            <div id="feedback"></div>
         `;
     },
     checkTF: (index, val) => {
@@ -253,11 +294,13 @@ const app = {
         if (index >= gameData.emojiMatch.length) return app.finishGame();
         const item = gameData.emojiMatch[index];
         document.getElementById('game-container').innerHTML = `
-            <div style="font-size:5rem; text-align:center; margin-bottom:1rem;">${item.emoji}</div>
-            <div class="options-grid">
-                ${item.options.map(o => `<button class="game-option-btn" onclick="app.checkEmoji(${index}, '${o}')">${o}</button>`).join('')}
+            <div style="text-align:center;">
+                <div style="font-size:8rem; text-align:center; margin-bottom:1rem; filter:drop-shadow(0 0 20px var(--primary-glow));">${item.emoji}</div>
+                <div class="options-grid">
+                    ${item.options.map(o => `<button class="game-option-btn" onclick="app.checkEmoji(${index}, '${o}')">${o}</button>`).join('')}
+                </div>
+                <div id="feedback"></div>
             </div>
-            <div id="feedback"></div>
         `;
     },
     checkEmoji: (index, val) => {
@@ -271,24 +314,19 @@ const app = {
 
     // --- 7. Listening ---
     renderListening: (index) => {
-        // Collect all vocab for this game
         if (!app.state.listeningQueue) {
-            // Flatten categories
             let all = [];
             Object.values(gameData.vocabCategories).forEach(arr => all.push(...arr));
-            app.state.listeningQueue = all.sort(() => Math.random() - 0.5).slice(0, 5); // Take 5 random
+            app.state.listeningQueue = all.sort(() => Math.random() - 0.5).slice(0, 5);
         }
 
         if (index >= app.state.listeningQueue.length) return app.finishGame();
         const item = app.state.listeningQueue[index];
 
-        // Generate wrong options
-        const allVocab = app.state.listeningQueue; // simplistic pool
-
         document.getElementById('game-container').innerHTML = `
             <div style="text-align:center; margin-top:2rem;">
-                <div style="font-size:4rem; margin-bottom:1rem; cursor:pointer;" onclick="app.speak('${item.eng}')">🔊</div>
-                <p>Haz clic en el icono para escuchar</p>
+                <div style="font-size:5rem; margin-bottom:1rem; cursor:pointer;" onclick="app.speak('${item.eng}')">🔊</div>
+                <p style="color:var(--text-muted);">Haz clic en el icono para escuchar</p>
                 
                 <h3 style="margin-top:2rem;">¿Qué escuchaste?</h3>
                 <div class="options-grid">
@@ -316,7 +354,6 @@ const app = {
 
     // --- 8. Spelling (Lluvia de Palabras) ---
     renderSpelling: (index) => {
-        // Uses Flattened vocab
         if (!app.state.listeningQueue) {
             let all = [];
             Object.values(gameData.vocabCategories).forEach(arr => all.push(...arr));
@@ -328,12 +365,23 @@ const app = {
         document.getElementById('game-container').innerHTML = `
             <div style="text-align:center;">
                 <h3>Escribe en Inglés:</h3>
-                <h2 style="color:var(--secondary); font-size:2.5rem; margin:1rem 0;">"${item.esp[0].toUpperCase()}"</h2>
-                <input type="text" id="spell-inp" style="padding:1rem; font-size:1.5rem; text-align:center; border-radius:12px; border:none;" autocomplete="off">
-                <button class="btn-primary" onclick="app.checkSpelling(${index})">Verificar</button>
+                <h2 style="color:var(--accent); font-size:3rem; margin:1.5rem 0; text-shadow:0 0 15px var(--primary-glow);">${item.esp[0].toUpperCase()}</h2>
+                <input type="text" id="spell-inp" class="translator-input" style="font-size:1.5rem; text-align:center; width: 60%; margin:0 auto;" autocomplete="off">
+                <br>
+                <button class="btn-primary" style="margin-top:2rem;" onclick="app.checkSpelling(${index})">Verificar</button>
                 <div id="feedback"></div>
             </div>
         `;
+        // Auto-check on Enter
+        setTimeout(() => {
+            const input = document.getElementById('spell-inp');
+            if (input) {
+                input.focus();
+                input.addEventListener('keyup', (e) => {
+                    if (e.key === 'Enter') app.checkSpelling(index);
+                });
+            }
+        }, 50);
     },
     checkSpelling: (index) => {
         const val = document.getElementById('spell-inp').value.toLowerCase().trim();
@@ -350,8 +398,8 @@ const app = {
     finishGame: () => {
         document.getElementById('game-container').innerHTML = `
             <div style="text-align:center; padding:3rem;">
-                <h1>🏆</h1>
-                <h2>¡Juego Terminado!</h2>
+                <div style="font-size: 5rem; margin-bottom: 1rem;">🏆</div>
+                <h2 style="font-size: 2.5rem; margin-bottom: 1rem; color:var(--text-main);">¡Juego Terminado!</h2>
                 <button class="btn-primary" onclick="app.showMenu()">Volver al Menú</button>
             </div>
         `;
@@ -362,10 +410,31 @@ const app = {
     },
     switchTab: (t) => {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        // Find rough match text
-        // Simplification for brevity in this massive update
-        document.getElementById('reference-content').innerHTML = `<h2>${gameData.reference[t].title}</h2>` +
-            gameData.reference[t].words.map(w => `<div style='background:rgba(255,255,255,0.05); padding:1rem; margin:0.5rem; border-radius:8px;'><b>${w.word}</b> = ${w.trans}</div>`).join('');
+        // Find button for tense map (simple logic)
+        const tenseMap = { 'present': 0, 'past': 1, 'future': 2 };
+        document.querySelectorAll('.tab-btn')[tenseMap[t]].classList.add('active');
+
+        // Render content
+        const data = gameData.reference[t];
+        document.getElementById('reference-content').innerHTML = `
+            <h2 style="text-align:center; margin-bottom:2rem;">${data.title}</h2>
+            <div style="display:grid; gap:1rem; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));">
+            ${data.words.map(w => `
+                <div style='background:rgba(255,255,255,0.05); padding:1rem; border-radius:12px; border:1px solid var(--glass-border);'>
+                    <div style="color:var(--primary); font-size:0.9rem;">${w.type}</div>
+                    <div style="font-size:1.2rem; font-weight:bold;">${w.word}</div>
+                    <div style="color:var(--text-muted);">${w.trans}</div>
+                </div>
+            `).join('')}
+            </div>
+            <h3 style="margin-top:2rem;">Ejemplos:</h3>
+             ${data.sentences.map(s => `
+                <div style='background:rgba(0,0,0,0.2); padding:1rem; margin-top:0.5rem; border-radius:12px; border-left:4px solid var(--secondary);'>
+                    <div>${s.eng}</div>
+                    <div style="color:var(--text-muted); font-style:italic;">${s.esp}</div>
+                </div>
+            `).join('')}
+        `;
     },
 
     // --- Existing Mini Games (Time Detective / Conjugator) ---
@@ -373,7 +442,9 @@ const app = {
         if (index >= gameData.timeDetective.length) return app.finishGame();
         const data = gameData.timeDetective[index];
         document.getElementById('game-container').innerHTML = `
-            <div style="text-align:center"><h2>"${data.text}"</h2>
+            <div style="text-align:center">
+            <span class="highlight" style="font-size:1rem; text-transform:uppercase; letter-spacing:2px; display:block; margin-bottom:1rem;">DETECTIVE</span>
+            <h2 style="font-size:2.5rem; margin-bottom:2rem;">"${data.text}"</h2>
             <div class="options-grid">
                 <button class="game-option-btn" onclick="app.checkTime(${index}, 'Present')">Present</button>
                 <button class="game-option-btn" onclick="app.checkTime(${index}, 'Past')">Past</button>
@@ -395,7 +466,10 @@ const app = {
         if (index >= gameData.conjugation.length) return app.finishGame();
         const data = gameData.conjugation[index];
         document.getElementById('game-container').innerHTML = `
-            <div style="text-align:center"><h2>Pasado de: ${data.base}</h2>
+            <div style="text-align:center">
+            <span class="highlight" style="font-size:1rem; text-transform:uppercase; letter-spacing:2px; display:block; margin-bottom:1rem;">CONJUGACIÓN</span>
+            <h2 style="margin-bottom:0.5rem">Pasado de:</h2>
+            <h1 style="font-size:4rem; color:var(--primary); text-shadow:0 0 20px var(--primary-glow); margin-bottom:2rem;">${data.base}</h1>
             <div class="options-grid">
                 ${data.options.map(o => `<button class="game-option-btn" onclick="app.checkConj(${index}, '${o}')">${o}</button>`).join('')}
             </div><div id="feedback"></div></div>
