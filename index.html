@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Master - Aprende Fácil</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <header>
+            <h1>English <span class="highlight">Master</span></h1>
+            <p>Domina el Pasado, Presente y Futuro</p>
+        </header>
+
+        <main id="main-content">
+            <!-- Menu View -->
+            <section id="menu-view" class="view active">
+                <div class="card-grid">
+                    <div class="card game-card" onclick="app.loadGame('sentence-builder')">
+                        <div class="icon">🧩</div>
+                        <h2>Constructor de Oraciones</h2>
+                        <p>Ordena las palabras para formar oraciones correctas. Aprende la estructura.</p>
+                        <div class="btn-primary">Jugar Ahora</div>
+                    </div>
+                    <div class="card game-card" onclick="app.loadGame('word-translator')">
+                        <div class="icon">📝</div>
+                        <h2>Traductor Veloz</h2>
+                        <p>Escribe la traducción correcta de las palabras.</p>
+                        <div class="btn-primary">Jugar Ahora</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Game View -->
+            <section id="game-view" class="view hidden">
+                <div class="game-header">
+                    <button class="back-btn" onclick="app.showMenu()">← Volver al Menú</button>
+                    <button class="help-btn" onclick="app.toggleGrammarHelp()">? Ayuda Gramatical</button>
+                </div>
+                <div id="game-container">
+                    <!-- Dynamic Game Content -->
+                </div>
+            </section>
+        </main>
+
+        <!-- Grammar Help Modal -->
+        <div id="grammar-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Guía Rápida de Gramática</h2>
+                    <button class="close-btn" onclick="app.toggleGrammarHelp()">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="concept-item">
+                        <h3>👤 Personal Pronouns (Pronombres)</h3>
+                        <p>Son las personas que realizan la acción.</p>
+                        <div class="example">Ejemplos: <strong>I</strong> (Yo), <strong>She</strong> (Ella),
+                            <strong>We</strong> (Nosotros).</div>
+                    </div>
+
+                    <div class="concept-item">
+                        <h3>⚡ Verbs (Verbos)</h3>
+                        <p>Es la acción que se realiza. Lo que se "hace".</p>
+                        <div class="example">Ejemplos: <strong>Wash</strong> (Lavar), <strong>Play</strong> (Jugar),
+                            <strong>Eat</strong> (Comer).</div>
+                    </div>
+
+                    <div class="concept-item">
+                        <h3>🛡️ Possessive Adj. (Posesivos)</h3>
+                        <p>Palabras que dicen de quién es algo.</p>
+                        <div class="example">Ejemplos: <strong>My</strong> (Mi), <strong>Your</strong> (Tu/Suyo),
+                            <strong>Our</strong> (Nuestro).</div>
+                    </div>
+
+                    <div class="concept-item">
+                        <h3>📦 Object (Objeto)</h3>
+                        <p>La cosa, animal o persona sobre la que recae la acción.</p>
+                        <div class="example">Ejemplos: <strong>Hands</strong> (Manos), <strong>House</strong> (Casa),
+                            <strong>Cat</strong> (Gato).</div>
+                    </div>
+
+                    <div class="concept-item">
+                        <h3>🪞 Reflexive Pronouns (Reflexivos)</h3>
+                        <p>Se usan cuando la acción la haces para ti mismo.</p>
+                        <div class="example">Ejemplos: <strong>Myself</strong> (Yo mismo), <strong>Himself</strong> (Él
+                            mismo).</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Creado para estudiar gramática inglesa.</p>
+        </footer>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notification-area"></div>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
