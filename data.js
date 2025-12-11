@@ -122,6 +122,58 @@ const gameData = {
         { eng: "Herself", esp: ["ella misma", "se"], hint: "Reflexivo (A ella misma)" }
     ],
 
+    // Game 3: Time Detective (New)
+    timeDetective: [
+        { text: "I walked to the park.", tense: "Past", hint: "Termina en -ed (regular)" },
+        { text: "She will cook dinner.", tense: "Future", hint: "Tiene 'will'" },
+        { text: "They play soccer.", tense: "Present", hint: "Verbo normal, sin ed ni will" },
+        { text: "He is happy.", tense: "Present", hint: "Verbo 'is' (ahora)" },
+        { text: "We ate pizza.", tense: "Past", hint: "Ate es el pasado de Eat" },
+        { text: "It will rain tomorrow.", tense: "Future", hint: "Tomorrow = Mañana" },
+        { text: "I study English.", tense: "Present", hint: "Hábito actual" },
+        { text: "You saw the movie.", tense: "Past", hint: "Saw es pasado de See" }
+    ],
+
+    // Game 4: Conjugation Challenge (New)
+    conjugation: [
+        {
+            base: "Go (Ir)",
+            correct: "Went",
+            options: ["Go", "Went", "Goned"],
+            type: "Past"
+        },
+        {
+            base: "Play (Jugar)",
+            correct: "Played",
+            options: ["Play", "Played", "Playid"],
+            type: "Past"
+        },
+        {
+            base: "Eat (Comer)",
+            correct: "Ate",
+            options: ["Eated", "Eat", "Ate"],
+            type: "Past"
+        },
+        {
+            base: "See (Ver)",
+            correct: "Saw",
+            options: ["See", "Saw", "Seed"],
+            type: "Past"
+        },
+        {
+            base: "Have (Tener)",
+            correct: "Had",
+            options: ["Haved", "Has", "Had"],
+            type: "Past"
+        },
+        {
+            base: "Do (Hacer)",
+            correct: "Did",
+            options: ["Doed", "Did", "Done"],
+            type: "Past"
+        }
+    ],
+
     // Reference Section Data
     reference: {
         present: {

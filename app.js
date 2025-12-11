@@ -45,6 +45,10 @@ const app = {
                     app.renderSentenceBuilder(0);
                 } else if (gameType === 'word-translator') {
                     app.renderTranslator(0);
+                } else if (gameType === 'time-detective') {
+                    app.renderTimeDetective(0);
+                } else if (gameType === 'verb-conjugator') {
+                    app.renderVerbConjugator(0);
                 }
             }
         }, 500);
@@ -256,6 +260,102 @@ const app = {
                     Respuestas posibles: ${data.esp.join(', ')}
                 </div>
             `;
+        }
+    },
+
+    // --- GAME 3: TIME DETECTIVE ---
+    renderTimeDetective: (index) => {
+        if (index >= gameData.timeDetective.length) {
+            app.showCompletionMessage("¡Detective Experto!", "Has identificado todos los tiempos correctamente.");
+            return;
+        }
+
+        const data = gameData.timeDetective[index];
+        const container = document.getElementById('game-container');
+
+        let html = `
+             <div style="text-align: center; margin-bottom: 2rem;">
+                <div style="font-size: 3rem; margin-bottom: 1rem">🕵️</div>
+                <p style="color: var(--text-muted); margin-bottom: 0.5rem">¿Pasado, Presente o Futuro?</p>
+                <h3 style="font-size: 2rem; margin-bottom: 2rem; color: var(--secondary)">"${data.text}"</h3>
+            </div>
+
+            <div class="quiz-options">
+                <button class="quiz-btn" onclick="app.checkTimeDetective(${index}, 'Present')">Present</button>
+                <button class="quiz-btn" onclick="app.checkTimeDetective(${index}, 'Past')">Past</button>
+                <button class="quiz-btn" onclick="app.checkTimeDetective(${index}, 'Future')">Future</button>
+            </div>
+
+            <div id="feedback-area"></div>
+        `;
+        container.innerHTML = html;
+    },
+
+    checkTimeDetective: (index, answer) => {
+        const data = gameData.timeDetective[index];
+        const feedback = document.getElementById('feedback-area');
+        const buttons = document.querySelectorAll('.quiz-btn');
+
+        if (data.tense === answer) {
+            feedback.innerHTML = `<div class="feedback-msg correct">¡Correcto! ${data.hint}</div>`;
+            buttons.forEach(btn => {
+                if (btn.innerText === answer) btn.classList.add('correct');
+            });
+            setTimeout(() => app.renderTimeDetective(index + 1), 1500);
+        } else {
+            feedback.innerHTML = `<div class="feedback-msg error">Incorrecto. Pista: ${data.hint}</div>`;
+            buttons.forEach(btn => {
+                if (btn.innerText === answer) btn.classList.add('wrong');
+            });
+        }
+    },
+
+    // --- GAME 4: VERB CONJUGATOR ---
+    renderVerbConjugator: (index) => {
+        if (index >= gameData.conjugation.length) {
+            app.showCompletionMessage("¡Maestro de Verbos!", "Dominas los verbos en pasado.");
+            return;
+        }
+
+        const data = gameData.conjugation[index];
+        const container = document.getElementById('game-container');
+
+        let html = `
+             <div style="text-align: center; margin-bottom: 2rem;">
+                <div style="font-size: 3rem; margin-bottom: 1rem">⚡</div>
+                <p style="color: var(--text-muted); margin-bottom: 0.5rem">Elige el Pasado Correcto de:</p>
+                <h3 style="font-size: 2.5rem; margin-bottom: 2rem; color: var(--primary)">${data.base}</h3>
+            </div>
+
+            <div class="quiz-options">
+                ${data.options.map(opt => `
+                    <button class="quiz-btn" onclick="app.checkConjugation(${index}, '${opt}')">${opt}</button>
+                `).join('')}
+            </div>
+
+            <div id="feedback-area"></div>
+        `;
+        container.innerHTML = html;
+    },
+
+    checkConjugation: (index, answer) => {
+        const data = gameData.conjugation[index];
+        const feedback = document.getElementById('feedback-area');
+        const buttons = document.querySelectorAll('.quiz-btn');
+
+        if (data.correct === answer) {
+            feedback.innerHTML = `<div class="feedback-msg correct">¡Súper!</div>`;
+            buttons.forEach(btn => {
+                if (btn.innerText === answer) btn.classList.add('correct');
+            });
+            setTimeout(() => app.renderVerbConjugator(index + 1), 1000);
+        } else {
+            feedback.innerHTML = `<div class="feedback-msg error">No exactamente. La respuesta es: ${data.correct}</div>`;
+            buttons.forEach(btn => {
+                if (btn.innerText === answer) btn.classList.add('wrong');
+                if (btn.innerText === data.correct) btn.classList.add('correct');
+            });
+            setTimeout(() => app.renderVerbConjugator(index + 1), 2000);
         }
     },
 
