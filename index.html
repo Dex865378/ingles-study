@@ -34,6 +34,29 @@
                         <p>Escribe la traducción correcta de las palabras.</p>
                         <div class="btn-primary">Jugar Ahora</div>
                     </div>
+                    <div class="card game-card" onclick="app.loadGame('study-reference')">
+                        <div class="icon">📚</div>
+                        <h2>Banco de Estudio</h2>
+                        <p>Listas de palabras y oraciones completas en Presente, Pasado y Futuro.</p>
+                        <div class="btn-primary">Estudiar</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Reference View -->
+            <section id="reference-view" class="view hidden">
+                <div class="game-header">
+                    <button class="back-btn" onclick="app.showMenu()">← Volver al Menú</button>
+                </div>
+
+                <div class="reference-tabs">
+                    <button class="tab-btn active" onclick="app.switchTab('present')">Presente</button>
+                    <button class="tab-btn" onclick="app.switchTab('past')">Pasado</button>
+                    <button class="tab-btn" onclick="app.switchTab('future')">Futuro</button>
+                </div>
+
+                <div id="reference-content" class="reference-content">
+                    <!-- Dynamic Content -->
                 </div>
             </section>
 
@@ -61,28 +84,32 @@
                         <h3>👤 Personal Pronouns (Pronombres)</h3>
                         <p>Son las personas que realizan la acción.</p>
                         <div class="example">Ejemplos: <strong>I</strong> (Yo), <strong>She</strong> (Ella),
-                            <strong>We</strong> (Nosotros).</div>
+                            <strong>We</strong> (Nosotros).
+                        </div>
                     </div>
 
                     <div class="concept-item">
                         <h3>⚡ Verbs (Verbos)</h3>
                         <p>Es la acción que se realiza. Lo que se "hace".</p>
                         <div class="example">Ejemplos: <strong>Wash</strong> (Lavar), <strong>Play</strong> (Jugar),
-                            <strong>Eat</strong> (Comer).</div>
+                            <strong>Eat</strong> (Comer).
+                        </div>
                     </div>
 
                     <div class="concept-item">
                         <h3>🛡️ Possessive Adj. (Posesivos)</h3>
                         <p>Palabras que dicen de quién es algo.</p>
                         <div class="example">Ejemplos: <strong>My</strong> (Mi), <strong>Your</strong> (Tu/Suyo),
-                            <strong>Our</strong> (Nuestro).</div>
+                            <strong>Our</strong> (Nuestro).
+                        </div>
                     </div>
 
                     <div class="concept-item">
                         <h3>📦 Object (Objeto)</h3>
                         <p>La cosa, animal o persona sobre la que recae la acción.</p>
                         <div class="example">Ejemplos: <strong>Hands</strong> (Manos), <strong>House</strong> (Casa),
-                            <strong>Cat</strong> (Gato).</div>
+                            <strong>Cat</strong> (Gato).
+                        </div>
                     </div>
 
                     <div class="concept-item">
