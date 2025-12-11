@@ -54,6 +54,7 @@ header h1 {
     color: var(--primary);
     background: -webkit-linear-gradient(45deg, #e879f9, #d946ef);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     filter: drop-shadow(0 0 10px var(--primary-glow));
 }
