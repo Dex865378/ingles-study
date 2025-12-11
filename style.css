@@ -1,3 +1,4 @@
+/* Base Styles kept ... */
 :root {
     --bg-dark: #090014;
     --bg-card: #130026;
@@ -7,7 +8,7 @@
     --secondary: #a855f7;
     /* Purple */
     --accent: #22d3ee;
-    /* Cyan for contrast */
+    /* Cyan */
     --text-main: #ffffff;
     --text-muted: #e9d5ff;
     --glass: rgba(19, 0, 38, 0.6);
@@ -55,6 +56,34 @@ header h1 {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     filter: drop-shadow(0 0 10px var(--primary-glow));
+}
+
+/* Level Selector */
+.level-selector-container {
+    margin-top: 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.5rem 1.5rem;
+    border-radius: 50px;
+    border: 1px solid var(--glass-border);
+}
+
+.level-selector-container select {
+    background: transparent;
+    color: var(--accent);
+    border: none;
+    font-size: 1.1rem;
+    font-family: var(--font-main);
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+}
+
+.level-selector-container select option {
+    background: var(--bg-card);
+    color: var(--text-main);
 }
 
 /* Grid for Menu */
@@ -130,6 +159,7 @@ header h1 {
     box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
     position: relative;
     overflow: visible;
+    /* Changed to visible for tooltips */
 }
 
 #game-container::before {
@@ -140,6 +170,8 @@ header h1 {
     right: 0;
     height: 4px;
     background: linear-gradient(90deg, var(--secondary), var(--primary), var(--accent));
+    border-radius: 24px 24px 0 0;
+    /* Corner fix */
 }
 
 /* Common UI Elements */
@@ -375,7 +407,7 @@ header h1 {
     z-index: 10;
 }
 
-/* Tooltip FIX - Making sure it's visible */
+/* Tooltip FIX */
 .word-chip::after {
     content: attr(data-trans);
     position: absolute;
@@ -428,19 +460,16 @@ header h1 {
         grid-template-columns: 1fr;
     }
 
-    .memory-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-
-    .category-grid {
-        grid-template-columns: 1fr;
-    }
-
     header h1 {
         font-size: 2.5rem;
     }
 
     .blank-input {
         width: 100px;
+    }
+
+    .word-chip::after {
+        bottom: 110%;
+        font-size: 0.8rem;
     }
 }

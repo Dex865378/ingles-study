@@ -16,6 +16,15 @@
         <header>
             <h1>English <span class="highlight">Master</span></h1>
             <p>La Super App de Estudio de Inglés</p>
+
+            <div class="level-selector-container">
+                <label>Nivel:</label>
+                <select id="difficulty-select" onchange="app.setDifficulty(this.value)">
+                    <option value="1">⭐ Principiante (Básico)</option>
+                    <option value="2">⭐⭐ Avanzado (Intermedio)</option>
+                    <option value="3">⭐⭐⭐ Experto (Pro)</option>
+                </select>
+            </div>
         </header>
 
         <main id="main-content">

@@ -1,14 +1,32 @@
 const app = {
     state: {
         score: 0,
-        currentQueue: [], // For queue-based games like Translator/Listening
+        currentQueue: [],
         currentIndex: 0,
         memoryFlipped: [],
-        memoryMatched: []
+        memoryMatched: [],
+        difficulty: 1 // 1=Beginner, 2=Advanced, 3=Expert
     },
 
     init: () => {
-        console.log("English Master v5 - Neon Edition Initialized");
+        console.log("English Master v6 - Leveled Initialized");
+    },
+
+    setDifficulty: (level) => {
+        app.state.difficulty = parseInt(level);
+        console.log("Difficulty set to:", app.state.difficulty);
+        // Visual feedback could be added here
+    },
+
+    // Helpler to filter content based on difficulty
+    // Returns items where item.level <= currentDifficulty
+    filterContent: (dataset) => {
+        return dataset.filter(item => {
+            // Include item if it strictly matches, OR if it is from a lower level
+            // User requirement: "Expert sees Advanced+Beginner", "Advanced sees Beginner".
+            // So: User Level 3 sees 1, 2, 3. User Level 1 sees 1.
+            return (item.level || 1) <= app.state.difficulty;
+        });
     },
 
     loadGame: (type) => {
@@ -37,18 +55,34 @@ const app = {
         setTimeout(() => { game.classList.remove('hidden'); game.classList.add('active'); }, 50);
         container.innerHTML = '';
 
-        // Route to Game Logic
-        switch (type) {
-            case 'sentence-builder': app.renderSentenceBuilder(0); break;
-            case 'translator-hub': app.renderTranslatorHub(); break;
-            case 'fill-blank': app.renderFillBlank(0); break;
-            case 'listening': app.renderListening(0); break;
-            case 'memory': app.renderMemory(); break;
-            case 'true-false': app.renderTrueFalse(0); break;
-            case 'emoji-match': app.renderEmojiMatch(0); break;
-            case 'spelling': app.renderSpelling(0); break;
-            case 'time-detective': app.renderTimeDetective(0); break;
-            case 'verb-conjugator': app.renderVerbConjugator(0); break;
+        // Pre-calculation for filtered queues
+        if (type === 'sentence-builder') {
+            app.state.currentQueue = app.filterContent(gameData.sentences);
+            app.renderSentenceBuilder(0);
+        } else if (type === 'translator-hub') {
+            app.renderTranslatorHub();
+        } else if (type === 'fill-blank') {
+            app.state.currentQueue = app.filterContent(gameData.fillBlank);
+            app.renderFillBlank(0);
+        } else if (type === 'listening') {
+            // Dynamic queue needed
+            app.renderListening(0);
+        } else if (type === 'memory') {
+            app.renderMemory();
+        } else if (type === 'true-false') {
+            app.state.currentQueue = app.filterContent(gameData.trueFalse);
+            app.renderTrueFalse(0);
+        } else if (type === 'emoji-match') {
+            app.state.currentQueue = app.filterContent(gameData.emojiMatch);
+            app.renderEmojiMatch(0);
+        } else if (type === 'spelling') {
+            app.renderSpelling(0);
+        } else if (type === 'time-detective') {
+            app.state.currentQueue = app.filterContent(gameData.timeDetective);
+            app.renderTimeDetective(0);
+        } else if (type === 'verb-conjugator') {
+            app.state.currentQueue = app.filterContent(gameData.conjugation);
+            app.renderVerbConjugator(0);
         }
     },
 
@@ -70,10 +104,12 @@ const app = {
         }, 500);
     },
 
-    // --- 1. Sentence Builder (Fixed Tooltips) ---
+    // --- 1. Sentence Builder ---
     renderSentenceBuilder: (index) => {
-        if (index >= gameData.sentences.length) return app.finishGame();
-        const data = gameData.sentences[index];
+        const queue = app.state.currentQueue;
+        if (index >= queue.length) return app.finishGame();
+
+        const data = queue[index];
         const words = [...data.words].sort(() => Math.random() - 0.5);
 
         document.getElementById('game-container').innerHTML = `
@@ -89,14 +125,14 @@ const app = {
             </div>
         `;
     },
-    me: (el) => { // Move Element
+    me: (el) => {
         const target = document.getElementById('target');
         const source = document.getElementById('source');
         if (el.parentNode === source) target.appendChild(el);
         else source.appendChild(el);
     },
     checkSent: (index) => {
-        const correct = gameData.sentences[index].correctOrder;
+        const correct = app.state.currentQueue[index].correctOrder;
         const current = Array.from(document.getElementById('target').children).map(el => el.innerText);
         if (JSON.stringify(correct) === JSON.stringify(current)) {
             document.getElementById('feedback').innerHTML = `<div class="feedback-msg correct">¡Correcto!</div>`;
@@ -125,7 +161,8 @@ const app = {
         `;
     },
     startTranslator: (cat) => {
-        app.state.currentQueue = gameData.vocabCategories[cat];
+        // Filter category items by difficulty
+        app.state.currentQueue = app.filterContent(gameData.vocabCategories[cat]);
         app.renderTranslator(0);
     },
     renderTranslator: (index) => {
@@ -143,15 +180,9 @@ const app = {
                 <div id="feedback"></div>
             </div>
         `;
-        // Auto-check on Enter
         setTimeout(() => {
             const input = document.getElementById('inp');
-            if (input) {
-                input.focus();
-                input.addEventListener('keyup', (e) => {
-                    if (e.key === 'Enter') app.checkTrans(index);
-                });
-            }
+            if (input) { input.focus(); input.addEventListener('keyup', (e) => { if (e.key === 'Enter') app.checkTrans(index); }); }
         }, 50);
     },
     checkTrans: (index) => {
@@ -167,8 +198,9 @@ const app = {
 
     // --- 3. Fill Blank ---
     renderFillBlank: (index) => {
-        if (index >= gameData.fillBlank.length) return app.finishGame();
-        const item = gameData.fillBlank[index];
+        const queue = app.state.currentQueue;
+        if (index >= queue.length) return app.finishGame();
+        const item = queue[index];
         const parts = item.sent.split('___');
 
         document.getElementById('game-container').innerHTML = `
@@ -185,15 +217,9 @@ const app = {
                 <div id="feedback"></div>
             </div>
         `;
-        // Auto-check on Enter
         setTimeout(() => {
             const input = document.getElementById('blank-inp');
-            if (input) {
-                input.focus();
-                input.addEventListener('keyup', (e) => {
-                    if (e.key === 'Enter') app.checkBlank(index, input.value);
-                });
-            }
+            if (input) { input.focus(); input.addEventListener('keyup', (e) => { if (e.key === 'Enter') app.checkBlank(index, input.value); }); }
         }, 50);
     },
     fillAndCheck: (index, val) => {
@@ -201,7 +227,7 @@ const app = {
         app.checkBlank(index, val);
     },
     checkBlank: (index, val) => {
-        const item = gameData.fillBlank[index];
+        const item = app.state.currentQueue[index];
         const feedback = document.getElementById('feedback');
         if (val.toLowerCase() === item.correct.toLowerCase()) {
             feedback.innerHTML = `<div class="feedback-msg correct">¡Perfecto!</div>`;
@@ -214,19 +240,18 @@ const app = {
         }
     },
 
-    // --- 4. Memory ---
+    // --- 4. Memory (Filtered) ---
     renderMemory: () => {
-        // Flat list pairs manually to ensure correct IDs
-        const deck = [...gameData.memoryCards, ...gameData.memoryCards].slice(0, 12); // Limit to 12 cards for now (6 pairs)
-        // Actually, previous implementation just duplicated the array.
-        // Let's make sure we have pairs. logic in data.js was: IDs 1-6.
-        // We need 12 cards total.
-        const cards = [...gameData.memoryCards]; // 12 items
-        const shuffled = cards.sort(() => Math.random() - 0.5);
+        // Filter memory cards
+        const availableCards = app.filterContent(gameData.memoryCards);
+        // Ensure we have an even number of pairs? Data structure is separate items.
+        // We probably need to select X pairs.
+        // Simplified: Just use all available filtered items.
+        const deck = availableCards.sort(() => Math.random() - 0.5);
 
         document.getElementById('game-container').innerHTML = `
             <div class="memory-grid">
-                ${shuffled.map((c, i) => `
+                ${deck.map((c, i) => `
                     <div class="memory-card" id="mem-${i}" onclick="app.flipCard(${i}, '${c.id}', '${c.content}')">
                         <div class="front">?</div>
                     </div>
@@ -247,12 +272,10 @@ const app = {
         if (app.state.memoryFlipped.length === 2) {
             const [c1, c2] = app.state.memoryFlipped;
             if (c1.id === c2.id) {
-                // Match
                 document.getElementById(`mem-${c1.index}`).classList.add('matched');
                 document.getElementById(`mem-${c2.index}`).classList.add('matched');
                 app.state.memoryFlipped = [];
             } else {
-                // No match
                 setTimeout(() => {
                     document.getElementById(`mem-${c1.index}`).innerHTML = '?';
                     document.getElementById(`mem-${c1.index}`).classList.remove('flipped');
@@ -266,8 +289,9 @@ const app = {
 
     // --- 5. True/False ---
     renderTrueFalse: (index) => {
-        if (index >= gameData.trueFalse.length) return app.finishGame();
-        const item = gameData.trueFalse[index];
+        const queue = app.state.currentQueue;
+        if (index >= queue.length) return app.finishGame();
+        const item = queue[index];
         document.getElementById('game-container').innerHTML = `
             <div style="text-align:center; margin-top:2rem;">
                 <h2 style="font-size:2rem; margin-bottom:3rem;">${item.q}</h2>
@@ -280,7 +304,7 @@ const app = {
         `;
     },
     checkTF: (index, val) => {
-        const item = gameData.trueFalse[index];
+        const item = app.state.currentQueue[index];
         if (val === item.correct) {
             document.getElementById('feedback').innerHTML = `<div class="feedback-msg correct">Correcto! ${item.explain}</div>`;
             setTimeout(() => app.renderTrueFalse(index + 1), 1500);
@@ -291,8 +315,9 @@ const app = {
 
     // --- 6. Emoji Match ---
     renderEmojiMatch: (index) => {
-        if (index >= gameData.emojiMatch.length) return app.finishGame();
-        const item = gameData.emojiMatch[index];
+        const queue = app.state.currentQueue;
+        if (index >= queue.length) return app.finishGame();
+        const item = queue[index];
         document.getElementById('game-container').innerHTML = `
             <div style="text-align:center;">
                 <div style="font-size:8rem; text-align:center; margin-bottom:1rem; filter:drop-shadow(0 0 20px var(--primary-glow));">${item.emoji}</div>
@@ -304,7 +329,7 @@ const app = {
         `;
     },
     checkEmoji: (index, val) => {
-        if (val === gameData.emojiMatch[index].correct) {
+        if (val === app.state.currentQueue[index].correct) {
             document.getElementById('feedback').innerHTML = `<div class="feedback-msg correct">¡Sí!</div>`;
             setTimeout(() => app.renderEmojiMatch(index + 1), 1000);
         } else {
@@ -314,10 +339,13 @@ const app = {
 
     // --- 7. Listening ---
     renderListening: (index) => {
-        if (!app.state.listeningQueue) {
+        if (index === 0) {
+            // Build queue
             let all = [];
-            Object.values(gameData.vocabCategories).forEach(arr => all.push(...arr));
-            app.state.listeningQueue = all.sort(() => Math.random() - 0.5).slice(0, 5);
+            Object.values(gameData.vocabCategories).forEach(arr => {
+                all.push(...app.filterContent(arr));
+            });
+            app.state.listeningQueue = all.sort(() => Math.random() - 0.5).slice(0, 8);
         }
 
         if (index >= app.state.listeningQueue.length) return app.finishGame();
@@ -354,9 +382,11 @@ const app = {
 
     // --- 8. Spelling (Lluvia de Palabras) ---
     renderSpelling: (index) => {
-        if (!app.state.listeningQueue) {
+        if (index === 0) {
             let all = [];
-            Object.values(gameData.vocabCategories).forEach(arr => all.push(...arr));
+            Object.values(gameData.vocabCategories).forEach(arr => {
+                all.push(...app.filterContent(arr));
+            });
             app.state.listeningQueue = all.sort(() => Math.random() - 0.5).slice(0, 5);
         }
         if (index >= app.state.listeningQueue.length) return app.finishGame();
@@ -372,15 +402,9 @@ const app = {
                 <div id="feedback"></div>
             </div>
         `;
-        // Auto-check on Enter
         setTimeout(() => {
             const input = document.getElementById('spell-inp');
-            if (input) {
-                input.focus();
-                input.addEventListener('keyup', (e) => {
-                    if (e.key === 'Enter') app.checkSpelling(index);
-                });
-            }
+            if (input) { input.focus(); input.addEventListener('keyup', (e) => { if (e.key === 'Enter') app.checkSpelling(index); }); }
         }, 50);
     },
     checkSpelling: (index) => {
@@ -410,11 +434,9 @@ const app = {
     },
     switchTab: (t) => {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        // Find button for tense map (simple logic)
         const tenseMap = { 'present': 0, 'past': 1, 'future': 2 };
         document.querySelectorAll('.tab-btn')[tenseMap[t]].classList.add('active');
 
-        // Render content
         const data = gameData.reference[t];
         document.getElementById('reference-content').innerHTML = `
             <h2 style="text-align:center; margin-bottom:2rem;">${data.title}</h2>
@@ -437,10 +459,11 @@ const app = {
         `;
     },
 
-    // --- Existing Mini Games (Time Detective / Conjugator) ---
+    // --- Mini Games ---
     renderTimeDetective: (index) => {
-        if (index >= gameData.timeDetective.length) return app.finishGame();
-        const data = gameData.timeDetective[index];
+        const queue = app.state.currentQueue;
+        if (index >= queue.length) return app.finishGame();
+        const data = queue[index];
         document.getElementById('game-container').innerHTML = `
             <div style="text-align:center">
             <span class="highlight" style="font-size:1rem; text-transform:uppercase; letter-spacing:2px; display:block; margin-bottom:1rem;">DETECTIVE</span>
@@ -454,7 +477,7 @@ const app = {
          `;
     },
     checkTime: (index, val) => {
-        if (val === gameData.timeDetective[index].tense) {
+        if (val === app.state.currentQueue[index].tense) {
             document.getElementById('feedback').innerHTML = `<div class="feedback-msg correct">Correct!</div>`;
             setTimeout(() => app.renderTimeDetective(index + 1), 1000);
         } else {
@@ -463,8 +486,9 @@ const app = {
     },
 
     renderVerbConjugator: (index) => {
-        if (index >= gameData.conjugation.length) return app.finishGame();
-        const data = gameData.conjugation[index];
+        const queue = app.state.currentQueue;
+        if (index >= queue.length) return app.finishGame();
+        const data = queue[index];
         document.getElementById('game-container').innerHTML = `
             <div style="text-align:center">
             <span class="highlight" style="font-size:1rem; text-transform:uppercase; letter-spacing:2px; display:block; margin-bottom:1rem;">CONJUGACIÓN</span>
@@ -476,11 +500,11 @@ const app = {
         `;
     },
     checkConj: (index, val) => {
-        if (val === gameData.conjugation[index].correct) {
+        if (val === app.state.currentQueue[index].correct) {
             document.getElementById('feedback').innerHTML = `<div class="feedback-msg correct">Yes!</div>`;
             setTimeout(() => app.renderVerbConjugator(index + 1), 1000);
         } else {
-            document.getElementById('feedback').innerHTML = `<div class="feedback-msg error">No, it's ${gameData.conjugation[index].correct}</div>`;
+            document.getElementById('feedback').innerHTML = `<div class="feedback-msg error">No, it's ${app.state.currentQueue[index].correct}</div>`;
         }
     }
 };
