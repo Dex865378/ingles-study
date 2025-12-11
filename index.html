@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>English Master - Aprende Fácil</title>
+    <title>English Master - Ultimate Suite</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
@@ -15,53 +15,104 @@
     <div class="app-container">
         <header>
             <h1>English <span class="highlight">Master</span></h1>
-            <p>Domina el Pasado, Presente y Futuro</p>
+            <p>La Super App de Estudio de Inglés</p>
         </header>
 
         <main id="main-content">
             <!-- Menu View -->
             <section id="menu-view" class="view active">
+                <div class="menu-intro">
+                    <h2>Selecciona tu Entrenamiento</h2>
+                </div>
+
                 <div class="card-grid">
-                    <div class="card game-card" onclick="app.loadGame('sentence-builder')">
+                    <!-- Original Tools -->
+                    <div class="card game-card standout" onclick="app.loadGame('sentence-builder')">
                         <div class="icon">🧩</div>
-                        <h2>Constructor de Oraciones</h2>
-                        <p>Ordena las palabras para formar oraciones correctas. Aprende la estructura.</p>
-                        <div class="btn-primary">Jugar Ahora</div>
-                    </div>
-                    <div class="card game-card" onclick="app.loadGame('word-translator')">
-                        <div class="icon">📝</div>
-                        <h2>Traductor Veloz</h2>
-                        <p>Escribe la traducción correcta de las palabras.</p>
-                        <div class="btn-primary">Jugar Ahora</div>
+                        <h3>Constructor de Oraciones</h3>
+                        <p>Ordena palabras y aprende estructura.</p>
                     </div>
 
+                    <div class="card game-card standout" onclick="app.loadGame('translator-hub')">
+                        <div class="icon">📝</div>
+                        <h3>Traductor Veloz</h3>
+                        <p>Vocabulario por categorías.</p>
+                    </div>
+
+                    <!-- New Games Batch 1 -->
+                    <div class="card game-card" onclick="app.loadGame('fill-blank')">
+                        <div class="icon">🕳️</div>
+                        <h3>Completa la Frase</h3>
+                        <p>Rellena espacios vacíos.</p>
+                    </div>
+
+                    <div class="card game-card" onclick="app.loadGame('listening')">
+                        <div class="icon">👂</div>
+                        <h3>Desafío de Escucha</h3>
+                        <p>Escucha y acierta.</p>
+                    </div>
+
+                    <div class="card game-card" onclick="app.loadGame('memory')">
+                        <div class="icon">🧠</div>
+                        <h3>Memoria</h3>
+                        <p>Encuentra las parejas.</p>
+                    </div>
+
+                    <div class="card game-card" onclick="app.loadGame('true-false')">
+                        <div class="icon">✅</div>
+                        <h3>Verdadero o Falso</h3>
+                        <p>Test rápido de gramática.</p>
+                    </div>
+
+                    <div class="card game-card" onclick="app.loadGame('emoji-match')">
+                        <div class="icon">🍎</div>
+                        <h3>Emoji Match</h3>
+                        <p>Vocabulario visual.</p>
+                    </div>
+
+                    <div class="card game-card" onclick="app.loadGame('spelling')">
+                        <div class="icon">⌨️</div>
+                        <h3>Lluvia de Palabras</h3>
+                        <p>Escribe rápido y bien.</p>
+                    </div>
+
+                    <!-- Time & Conjugation -->
                     <div class="card game-card" onclick="app.loadGame('time-detective')">
                         <div class="icon">🕵️</div>
-                        <h2>Detective del Tiempo</h2>
-                        <p>¿Pasado, Presente o Futuro? Adivina el tiempo de la oración.</p>
-                        <div class="btn-primary">Jugar Ahora</div>
+                        <h3>Detective</h3>
+                        <p>¿Pasado, Presente o Futuro?</p>
                     </div>
 
                     <div class="card game-card" onclick="app.loadGame('verb-conjugator')">
                         <div class="icon">⚡</div>
-                        <h2>Conjugación Express</h2>
-                        <p>Elige el Pasado correcto para cada Verbo.</p>
-                        <div class="btn-primary">Jugar Ahora</div>
+                        <h3>Conjugación</h3>
+                        <p>Domina los verbos.</p>
                     </div>
 
-                    <div class="card game-card" onclick="app.loadGame('study-reference')">
+                    <!-- Reference -->
+                    <div class="card game-card ref-card-menu" onclick="app.loadGame('study-reference')">
                         <div class="icon">📚</div>
-                        <h2>Banco de Estudio</h2>
-                        <p>Listas de palabras y oraciones completas en Presente, Pasado y Futuro.</p>
-                        <div class="btn-primary">Estudiar</div>
+                        <h3>Banco de Estudio</h3>
+                        <p>Repasa antes de jugar.</p>
                     </div>
+                </div>
+            </section>
+
+            <!-- Game View -->
+            <section id="game-view" class="view hidden">
+                <div class="game-header">
+                    <button class="back-btn" onclick="app.showMenu()">← Menú</button>
+                    <button class="help-btn" onclick="app.toggleGrammarHelp()">? Ayuda</button>
+                </div>
+                <div id="game-container">
+                    <!-- Dynamic Content -->
                 </div>
             </section>
 
             <!-- Reference View -->
             <section id="reference-view" class="view hidden">
                 <div class="game-header">
-                    <button class="back-btn" onclick="app.showMenu()">← Volver al Menú</button>
+                    <button class="back-btn" onclick="app.showMenu()">← Menú</button>
                 </div>
 
                 <div class="reference-tabs">
@@ -70,81 +121,32 @@
                     <button class="tab-btn" onclick="app.switchTab('future')">Futuro</button>
                 </div>
 
-                <div id="reference-content" class="reference-content">
-                    <!-- Dynamic Content -->
-                </div>
-            </section>
-
-            <!-- Game View -->
-            <section id="game-view" class="view hidden">
-                <div class="game-header">
-                    <button class="back-btn" onclick="app.showMenu()">← Volver al Menú</button>
-                    <button class="help-btn" onclick="app.toggleGrammarHelp()">? Ayuda Gramatical</button>
-                </div>
-                <div id="game-container">
-                    <!-- Dynamic Game Content -->
-                </div>
+                <div id="reference-content" class="reference-content"></div>
             </section>
         </main>
 
-        <!-- Grammar Help Modal -->
+        <!-- Notification -->
         <div id="grammar-modal" class="modal hidden">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2>Guía Rápida de Gramática</h2>
+                    <h2>Guía Rápida</h2>
                     <button class="close-btn" onclick="app.toggleGrammarHelp()">×</button>
                 </div>
                 <div class="modal-body">
                     <div class="concept-item">
-                        <h3>👤 Personal Pronouns (Pronombres)</h3>
-                        <p>Son las personas que realizan la acción.</p>
-                        <div class="example">Ejemplos: <strong>I</strong> (Yo), <strong>She</strong> (Ella),
-                            <strong>We</strong> (Nosotros).
-                        </div>
-                    </div>
-
-                    <div class="concept-item">
-                        <h3>⚡ Verbs (Verbos)</h3>
-                        <p>Es la acción que se realiza. Lo que se "hace".</p>
-                        <div class="example">Ejemplos: <strong>Wash</strong> (Lavar), <strong>Play</strong> (Jugar),
-                            <strong>Eat</strong> (Comer).
-                        </div>
-                    </div>
-
-                    <div class="concept-item">
-                        <h3>🛡️ Possessive Adj. (Posesivos)</h3>
-                        <p>Palabras que dicen de quién es algo.</p>
-                        <div class="example">Ejemplos: <strong>My</strong> (Mi), <strong>Your</strong> (Tu/Suyo),
-                            <strong>Our</strong> (Nuestro).
-                        </div>
-                    </div>
-
-                    <div class="concept-item">
-                        <h3>📦 Object (Objeto)</h3>
-                        <p>La cosa, animal o persona sobre la que recae la acción.</p>
-                        <div class="example">Ejemplos: <strong>Hands</strong> (Manos), <strong>House</strong> (Casa),
-                            <strong>Cat</strong> (Gato).
-                        </div>
-                    </div>
-
-                    <div class="concept-item">
-                        <h3>🪞 Reflexive Pronouns (Reflexivos)</h3>
-                        <p>Se usan cuando la acción la haces para ti mismo.</p>
-                        <div class="example">Ejemplos: <strong>Myself</strong> (Yo mismo), <strong>Himself</strong> (Él
-                            mismo).</div>
+                        <h3>Tips Rápidos</h3>
+                        <p><strong>Pasado:</strong> Suele terminar en -ed (jugó/play-ed) o cambiar (fue/went).</p>
+                        <p><strong>Futuro:</strong> Busca la palabra 'Will'.</p>
+                        <p><strong>Presente:</strong> Cosas que haces habitualmente.</p>
                     </div>
                 </div>
             </div>
         </div>
 
         <footer>
-            <p>Creado para estudiar gramática inglesa.</p>
+            <p>English Master v4.0 - All in One Study App</p>
         </footer>
     </div>
-
-    <!-- Notification Container -->
-    <div id="notification-area"></div>
-
     <script src="data.js"></script>
     <script src="app.js"></script>
 </body>
